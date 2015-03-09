@@ -35,36 +35,42 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
 	  
-	  <h3><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Première partie</h3>
-	  
-	  <h4><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description générale</h4>
+	  <h3><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description générale</h3>
 	  
 	  <p>Dans cette section, une description générale du projet sera proposé. Deux versions du système y 
-	  seront décrites avec dans chacune d'elle les états et le code.</p>
+	  seront décrites avec dans chacune d'elle les états, le code et les vérifications.</p>
+
+          <p>Le projet si présent vise à faire la gestion d'un pont à l'aide de véhicules autonomes qui veulent traverser un pont à voie unique. La modélisation de
+          ce système se fera à l'aide d'automates temporisés et une vérification complète du système devra être faite à l'aide de la logique CTL. Voici une image 
+          permettant de mieux visualiser le problème et qui est tiré de l'énoncé du laboratoire fait par Sylvie Ratté. Le tout devra être fait avec UPPAAL.</p>
+
+          <im src="description_generale.png"></img>
+
+	  <h3><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Première partie</h3>
 	  
-	  <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Objets</h5>
+	  <h4><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Objets</h4>
 	  
-	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Véhicule A</h6>
+	  <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Véhicule A</h5>
 	  
 	  <p>Premièrement, le véhicule s'approche du pont. Par la suite, il demande au controleur s'il peut passer sur le pont et il le fait jusqu'à ce qu'il
           obtienne une réponse positive de celui-ci. Ensuite, il passe le pont.</p>
 	  
 	  <img src="images/VAA.png"></img>
 	  
-	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Véhicule B</h6>
+	  <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Véhicule B</h5>
 
 	  <p>Premièrement, le véhicule s'approche du pont. Par la suite, il demande au controleur s'il peut passer sur le pont et il le fait jusqu'à ce qu'il
           obtienne une réponse positive de celui-ci. Ensuite, il passe le pont.</p>
 	  
 	  <img src="images/VAB.png"></img>
 	  
-	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pont</h6>
+	  <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pont</h5>
 	  
 	  <p>Il ne fait que maintenir l'état de la direction dans lequel le pont fait face, donc en direction de A ou de B.</p>	  
 	  
 	  <img src="images/P.png"></img>
 	  
-	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Controleur</h6>
+	  <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Controleur</h5>
 	  
 	  <p>Celui-ci prends la première requête qu'il recoit et lui envoit un message comme quoi sa requête est accepté. Les requêtes venant de l'autre coté
           ne seront pas acceptées tant que le pont ne sera pas vide. Une fois la requête accepté le véhicule choisi entre sur le pont. Les requêtes sont ensuite
@@ -73,7 +79,7 @@
 	  
 	  <img src="images/CRTL.png"></img>
 	  
-	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code</h6>
+	  <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code</h5>
 
 	  <p>Voici le code utilisé dans les divers objets. On peut facilement remarquer qu'aucune fonction n'a été
 	  nécessaire et que tout c'est fait à partir d'états seulement</p>
@@ -98,13 +104,19 @@ int firstRequest := 0;
 int carPassed := 0;
 	  </code></pre>
 
-          <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Communication</h6>
+          <h5><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Communication</h5>
 
 	  <p>Voici un diagramme démontrant les communications entre les objets. L'objet Véhicule B a été omis afin d'allégé la lecture du diagramme et, de plus
           celui-ci est identique à l'objet Véhicule A.</p>
 
           <img src="images/comm_part1.png"></img>
 
+          <h4><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vérifications</h4>
+
+          <ul>
+          	<li>P1 : Il n’y a pas de collision (i.e. deux véhicules circulants en sens inverse) sur le pont.</li>
+          	<li>P2 : Un véhicule qui arrive est certain de passer sur le pont à l’issue d’une durée bornée.</li>
+          </ul>
 
         <!-- <h3>
 <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
