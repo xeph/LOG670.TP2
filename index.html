@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
   <head>
@@ -46,25 +46,30 @@
 	  
 	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Véhicule A</h6>
 	  
-	  <p>abc</p>
+	  <p>Premièrement, le véhicule s'approche du pont. Par la suite, il demande au controleur s'il peut passer sur le pont et il le fait jusqu'à ce qu'il
+          obtienne une réponse positive de celui-ci. Ensuite, il passe le pont.</p>
 	  
 	  <img src="images/VAA.png"></img>
 	  
 	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Véhicule B</h6>
 
-	  <p>abc</p>
+	  <p>Premièrement, le véhicule s'approche du pont. Par la suite, il demande au controleur s'il peut passer sur le pont et il le fait jusqu'à ce qu'il
+          obtienne une réponse positive de celui-ci. Ensuite, il passe le pont.</p>
 	  
 	  <img src="images/VAB.png"></img>
 	  
 	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pont</h6>
 	  
-	  <p>abc</p>	  
+	  <p>Il ne fait que maintenir l'état de la direction dans lequel le pont fait face, donc en direction de A ou de B.</p>	  
 	  
 	  <img src="images/P.png"></img>
 	  
 	  <h6><a id="etats_justifies" class="anchor" href="#etats_justifies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Controleur</h6>
 	  
-	  <p>abc</p>
+	  <p>Celui-ci prends la première requête qu'il recoit et lui envoit un message comme quoi sa requête est accepté. Les requêtes venant de l'autre coté
+          ne seront pas acceptées tant que le pont ne sera pas vide. Une fois la requête accepté le véhicule choisi entre sur le pont. Les requêtes sont ensuite
+          traitées et le véhicule traverse finalement le pont. Alors, le pont devient libre pour permettre à un autre véhicule de traverser et un conteur garde
+          une piste du nombre de véhicule qui ont traversé.</p>
 	  
 	  <img src="images/CRTL.png"></img>
 	  
@@ -73,7 +78,7 @@
 	  <p>Voici le code utilisé dans les divers objets. On peut facilement remarquer qu'aucune fonction n'a été
 	  nécessaire et que tout c'est fait à partir d'états seulement</p>
 	  
-	  <pre><code class="cs">
+	  <pre><code>
 // Global declarations
 chan RequestA, AcceptedA, RejectedA, RequestB, AcceptedB, RejectedB, FreeA, FreeB;
 chan EntryA, ExitA, EntryB, ExitB;
