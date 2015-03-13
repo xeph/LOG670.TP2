@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+const int MINPASSTIME = 10;
+const int MAXPASSTIME = 20;
+const int MAXWAITTIME = 200;
+const int MAXPASSCAR = 3;
+const int MAXREQUEST = 11;
+
+chan RequestA, AcceptedA, RejectedA, RequestB, AcceptedB, RejectedB, FreeA, FreeB;
+chan EntryA, ExitA, EntryB, ExitB;</declaration><template><name x="5" y="5">VAA</name><declaration>// Place local declarations here.
+bool requestAsked := false;
+bool canPass := false;
+int passed := 0;
+clock passingBridge;
+clock waitingTime;
+clock requestTime;
+
+void resetCar() {
+  canPass := false;
+  requestAsked := false;
+  passed++;
+}
+
+void resetRequest() {
+  requestAsked := false;
+  requestTime := 0;
+}
+
+void startRequest() {
+  requestAsked := true;
+  waitingTime :=0;
+  requestTime := 0;
+}</declaration><location id="id0" x="168" y="-24"><name x="152" y="-16">End</name></location><location id="id1" x="-168" y="-240"><name x="-216" y="-232">IdleBridge</name><label kind="invariant" x="-352" y="-216">waitingTime &lt;= MAXWAITTIME &amp;&amp;
+requestTime &lt;= MAXREQUEST</label></location><location id="id2" x="-40" y="-24"><name x="-80" y="-16">PassedBridge</name></location><location id="id3" x="-40" y="-152"><name x="-24" y="-176">PassingBridge</name><label kind="invariant" x="-24" y="-160">passingBridge &lt;= MAXPASSTIME</label></location><location id="id4" x="-440" y="-240"><name x="-496" y="-280">ApprochingBridge</name></location><location id="id5" x="-512" y="-240"><name x="-520" y="-224">Off</name></location><init ref="id5"/><transition><source ref="id2"/><target ref="id0"/><label kind="guard" x="-24" y="-48">passed == MAXPASSCAR</label></transition><transition><source ref="id2"/><target ref="id4"/><label kind="guard" x="-432" y="-64">passed &lt; MAXPASSCAR</label><label kind="assignment" x="-432" y="-48">resetCar()</label><nail x="-440" y="-24"/></transition><transition><source ref="id1"/><target ref="id1"/><label kind="guard" x="-368" y="-360">requestAsked == true</label><label kind="synchronisation" x="-344" y="-344">RejectedA?</label><label kind="assignment" x="-352" y="-328">resetRequest()</label><nail x="-304" y="-304"/><nail x="-272" y="-304"/></transition><transition><source ref="id1"/><target ref="id1"/><label kind="guard" x="-240" y="-408">requestAsked == false</label><label kind="synchronisation" x="-200" y="-392">RequestA!</label><label kind="assignment" x="-224" y="-376">requestAsked := true</label><nail x="-176" y="-352"/><nail x="-152" y="-352"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="guard" x="-32" y="-128">passingBridge &gt;= MINPASSTIME</label><label kind="synchronisation" x="-32" y="-112">ExitA!</label></transition><transition><source ref="id1"/><target ref="id3"/><label kind="guard" x="-96" y="-248">canPass == true</label><label kind="synchronisation" x="-64" y="-232">EntryA!</label><label kind="assignment" x="-88" y="-216">passingBridge := 0</label></transition><transition><source ref="id1"/><target ref="id1"/><label kind="guard" x="-104" y="-344">requestAsked == true</label><label kind="synchronisation" x="-80" y="-328">AcceptedA?</label><label kind="assignment" x="-88" y="-312">canPass := true</label><nail x="-88" y="-296"/><nail x="-64" y="-288"/></transition><transition><source ref="id4"/><target ref="id1"/><label kind="synchronisation" x="-344" y="-280">RequestA!</label><label kind="assignment" x="-360" y="-264">startRequest()</label></transition><transition><source ref="id5"/><target ref="id4"/></transition></template><template><name>BridgeControler</name><declaration>// Place local declarations here.
+int firstRequest := 0;
+int lastRequest := 0;
+int carPassed := 0;
+int carOnBridge := 0;
+clock carFlowTime;
+
+void endExitA() {
+  carPassed++;
+  carOnBridge--;
+  lastRequest := 1;
+}
+
+void endExitB() {
+  carPassed++;
+  carOnBridge--;
+  lastRequest := 2;
+}
+
+void entry() {
+  carOnBridge++;
+  carFlowTime := 0;
+}</declaration><location id="id6" x="-768" y="-488"><name x="-800" y="-520">AcceptingA</name><committed/></location><location id="id7" x="-344" y="-488"><name x="-376" y="-520">AcceptingB</name><committed/></location><location id="id8" x="-184" y="-176"><name x="-216" y="-168">ProcessingRequestBB</name><committed/></location><location id="id9" x="-120" y="-288"><name x="-192" y="-280">ProcessingRequestAB</name><committed/></location><location id="id10" x="-1000" y="-288"><name x="-1048" y="-280">ProcessingRequestAA</name><committed/></location><location id="id11" x="-880" y="-168"><name x="-968" y="-160">ProcessingRequestBA</name><committed/></location><location id="id12" x="-560" y="-392"><name x="-600" y="-440">FirstRequest</name><committed/></location><location id="id13" x="-344" y="-336"><name x="-440" y="-360">VehicleFromB</name></location><location id="id14" x="-768" y="-336"><name x="-760" y="-360">VehicleFromA</name></location><location id="id15" x="-560" y="-240"><name x="-608" y="-232">WaitingRequest</name></location><init ref="id15"/><transition><source ref="id13"/><target ref="id13"/><label kind="guard" x="-288" y="-496">carFlowTime &lt;= 20</label><label kind="synchronisation" x="-248" y="-480">EntryB?</label><label kind="assignment" x="-272" y="-456">carOnBridge++</label><nail x="-272" y="-432"/><nail x="-216" y="-432"/></transition><transition><source ref="id14"/><target ref="id14"/><label kind="guard" x="-944" y="-496">carFlowTime &lt;= 20</label><label kind="synchronisation" x="-896" y="-480">EntryA?</label><label kind="assignment" x="-920" y="-464">carOnBridge++</label><nail x="-896" y="-440"/><nail x="-848" y="-440"/></transition><transition><source ref="id13"/><target ref="id13"/><label kind="guard" x="-192" y="-416">carOnBridge &gt; 1</label><label kind="synchronisation" x="-168" y="-400">ExitB?</label><label kind="assignment" x="-184" y="-384">carOnBridge--</label><nail x="-200" y="-408"/><nail x="-200" y="-368"/></transition><transition><source ref="id14"/><target ref="id14"/><label kind="guard" x="-1056" y="-424">carOnBridge &gt; 1</label><label kind="synchronisation" x="-1024" y="-408">ExitA?</label><label kind="assignment" x="-1048" y="-392">carOnBridge--</label><nail x="-952" y="-416"/><nail x="-952" y="-376"/></transition><transition><source ref="id13"/><target ref="id15"/><label kind="guard" x="-488" y="-240">carOnBridge == 1</label><label kind="synchronisation" x="-448" y="-224">ExitB?</label><label kind="assignment" x="-472" y="-208">endExitB()</label><nail x="-392" y="-240"/></transition><transition><source ref="id14"/><target ref="id15"/><label kind="guard" x="-728" y="-240">carOnBridge == 1</label><label kind="synchronisation" x="-704" y="-224">ExitA?</label><label kind="assignment" x="-728" y="-208">endExitA()</label><nail x="-736" y="-240"/></transition><transition><source ref="id6"/><target ref="id14"/><label kind="synchronisation" x="-760" y="-416">EntryA?</label></transition><transition><source ref="id7"/><target ref="id13"/><label kind="synchronisation" x="-400" y="-416">EntryB?</label></transition><transition><source ref="id8"/><target ref="id13"/><label kind="synchronisation" x="-304" y="-216">AcceptedB!</label><nail x="-272" y="-248"/></transition><transition><source ref="id13"/><target ref="id8"/><label kind="synchronisation" x="-216" y="-240">RequestB?</label><nail x="-248" y="-256"/></transition><transition><source ref="id9"/><target ref="id13"/><label kind="synchronisation" x="-264" y="-296">RejectedA!</label><nail x="-216" y="-296"/></transition><transition><source ref="id13"/><target ref="id9"/><label kind="synchronisation" x="-224" y="-344">RequestA?</label><nail x="-200" y="-320"/></transition><transition><source ref="id10"/><target ref="id14"/><label kind="synchronisation" x="-912" y="-296">AcceptedA!</label><nail x="-872" y="-296"/></transition><transition><source ref="id14"/><target ref="id10"/><label kind="synchronisation" x="-944" y="-344">RequestA?</label><nail x="-920" y="-320"/></transition><transition><source ref="id11"/><target ref="id14"/><label kind="synchronisation" x="-928" y="-232">RejectedB!</label><nail x="-848" y="-248"/></transition><transition><source ref="id14"/><target ref="id11"/><label kind="synchronisation" x="-840" y="-200">RequestB?</label><nail x="-808" y="-232"/></transition><transition><source ref="id12"/><target ref="id7"/><label kind="guard" x="-520" y="-496">firstRequest == 2</label><label kind="synchronisation" x="-504" y="-480">AcceptedB!</label><label kind="assignment" x="-488" y="-464">entry()</label></transition><transition><source ref="id12"/><target ref="id6"/><label kind="guard" x="-720" y="-504">firstRequest == 1</label><label kind="synchronisation" x="-704" y="-488">AcceptedA!</label><label kind="assignment" x="-688" y="-472">entry()</label></transition><transition><source ref="id15"/><target ref="id12"/><label kind="guard" x="-536" y="-304">lastRequest != 2</label><label kind="synchronisation" x="-528" y="-288">RequestB?</label><label kind="assignment" x="-544" y="-272">firstRequest := 2</label><nail x="-536" y="-312"/></transition><transition><source ref="id15"/><target ref="id12"/><label kind="guard" x="-688" y="-304">lastRequest != 1</label><label kind="synchronisation" x="-680" y="-288">RequestA?</label><label kind="assignment" x="-688" y="-272">firstRequest := 1</label><nail x="-576" y="-312"/></transition></template><template><name>VAB</name><declaration>// Place local declarations here.
+bool requestAsked := false;
+bool canPass := false;
+int passed := 0;
+clock passingBridge;
+clock waitingTime;
+clock requestTime;
+
+void resetCar() {
+  canPass := false;
+  requestAsked := false;
+  passed++;
+}
+
+void resetRequest() {
+  requestAsked := false;
+  requestTime := 0;
+}
+
+void startRequest() {
+  requestAsked := true;
+  waitingTime :=0;
+  requestTime := 0;
+}</declaration><location id="id16" x="368" y="168"><name x="358" y="138">End</name></location><location id="id17" x="152" y="168"><name x="112" y="176">PassedBridge</name></location><location id="id18" x="152" y="32"><name x="168" y="8">PassingBridge</name><label kind="invariant" x="168" y="24">passingBridge &lt;= MAXPASSTIME</label></location><location id="id19" x="-40" y="-40"><name x="-72" y="-24">IdleBridge</name><label kind="invariant" x="-192" y="-8">waitingTime &lt; MAXWAITTIME &amp;&amp;
+requestTime &lt;= MAXREQUEST</label></location><location id="id20" x="-272" y="-40"><name x="-320" y="-80">ApprochingBridge</name></location><location id="id21" x="-328" y="-40"><name x="-336" y="-32">Off</name></location><init ref="id21"/><transition><source ref="id17"/><target ref="id16"/><label kind="guard" x="176" y="144">passed == MAXPASSCAR</label></transition><transition><source ref="id17"/><target ref="id20"/><label kind="guard" x="-264" y="128">passed &lt; MAXPASSCAR</label><label kind="assignment" x="-264" y="144">resetCar()</label><nail x="-272" y="168"/></transition><transition><source ref="id19"/><target ref="id19"/><label kind="guard" x="-88" y="-200">requestAsked == false</label><label kind="synchronisation" x="-48" y="-184">RequestB!</label><label kind="assignment" x="-72" y="-168">requestAsked := true</label><nail x="-24" y="-152"/><nail x="0" y="-152"/></transition><transition><source ref="id19"/><target ref="id19"/><label kind="guard" x="72" y="-144">requestAsked == true</label><label kind="synchronisation" x="104" y="-128">AcceptedB?</label><label kind="assignment" x="88" y="-112">canPass := true</label><nail x="64" y="-96"/><nail x="104" y="-88"/></transition><transition><source ref="id19"/><target ref="id19"/><label kind="guard" x="-216" y="-160">requestAsked == true</label><label kind="synchronisation" x="-184" y="-144">RejectedB?</label><label kind="assignment" x="-192" y="-128">resetRequest()</label><nail x="-160" y="-104"/><nail x="-104" y="-104"/></transition><transition><source ref="id18"/><target ref="id17"/><label kind="guard" x="160" y="72">passingBridge &gt;= MINPASSTIME</label><label kind="synchronisation" x="160" y="88">ExitB!</label></transition><transition><source ref="id19"/><target ref="id18"/><label kind="guard" x="64" y="-56">canPass == true</label><label kind="synchronisation" x="88" y="-40">EntryB!</label><label kind="assignment" x="64" y="-24">passingBridge := 0</label></transition><transition><source ref="id20"/><target ref="id19"/><label kind="synchronisation" x="-184" y="-80">RequestB!</label><label kind="assignment" x="-200" y="-64">startRequest()</label></transition><transition><source ref="id21"/><target ref="id20"/></transition></template><system>// Place template instantiations here.
+vehicleA = VAA();
+vehicleA2 = VAA();
+vehicleB = VAB();
+PCTL = BridgeControler();
+
+// List one or more processes to be composed into a system.
+system PCTL, vehicleA, vehicleB, vehicleA2;</system></nta>

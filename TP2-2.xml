@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>const int N = 6;
+typedef int[0,N-1] id_t;
+
+chan        approaching[N], approachingPrio[N], wait[N];
+urgent chan pass[N], passed[N];
+</declaration><template><name x="5" y="5">Controller</name><declaration>id_t list[N+1];
+int[0,N] len;
+
+id_t listPrio[N+1];
+int[0,N] lenPrio;
+
+id_t passing_id;
+id_t approaching_id;
+
+void enqueue(id_t element)
+{
+        list[len++] = element;
+}
+
+void dequeue()
+{
+        int i = 0;
+        len -= 1;
+        while (i &lt; len)
+        {
+                list[i] = list[i + 1];
+                i++;
+        }
+        list[i] = 0;
+}
+
+void enqueuePrio(id_t element)
+{
+        listPrio[lenPrio++] = element;
+}
+
+void dequeuePrio()
+{
+        int i = 0;
+        lenPrio -= 1;
+        while (i &lt; lenPrio)
+        {
+                listPrio[i] = listPrio[i + 1];
+                i++;
+        }
+        listPrio[i] = 0;
+}
+
+void dequeueWithId(id_t element)
+{
+	if (listPrio[0] == element)
+		dequeuePrio();
+	else if (list[0] == element)
+		dequeue();
+}
+
+bool isFrontPrio()
+{
+	return lenPrio &gt; 0;
+}
+
+int queueCount()
+{
+	return len + lenPrio;
+}
+
+id_t front()
+{
+	if (isFrontPrio()) 
+		return listPrio[0];
+	else
+		return list[0];
+}
+
+id_t tail()
+{
+	if (len &gt; 0)
+		return list[len - 1];
+	else
+		return listPrio[lenPrio - 1];
+}
+</declaration><location id="id0" x="-456" y="-544"><name x="-464" y="-584">Waiting</name></location><location id="id1" x="-984" y="-528"><committed/></location><init ref="id0"/><transition><source ref="id0"/><target ref="id0"/><label kind="select" x="-488" y="-352">e : id_t</label><label kind="guard" x="-488" y="-336">passing_id != 0</label><label kind="synchronisation" x="-488" y="-320">passed[e]?</label><label kind="assignment" x="-488" y="-304">passing_id := 0, dequeueWithId(e)</label><nail x="-496" y="-352"/><nail x="-344" y="-352"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="guard" x="-656" y="-384">queueCount() == 1</label><label kind="assignment" x="-664" y="-368">approaching_id := 0</label><nail x="-872" y="-392"/><nail x="-552" y="-392"/></transition><transition><source ref="id0"/><target ref="id0"/><label kind="guard" x="-200" y="-576">passing_id == 0</label><label kind="synchronisation" x="-200" y="-560">pass[front()]!</label><label kind="assignment" x="-200" y="-544">passing_id := front()</label><nail x="-208" y="-480"/><nail x="-208" y="-616"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="guard" x="-656" y="-464">queueCount() &gt; 1</label><label kind="synchronisation" x="-672" y="-448">wait[approaching_id]!</label><label kind="assignment" x="-664" y="-432">approaching_id := 0</label><nail x="-872" y="-472"/><nail x="-552" y="-472"/></transition><transition><source ref="id0"/><target ref="id1"/><label kind="select" x="-600" y="-768">e : id_t</label><label kind="synchronisation" x="-656" y="-752">approaching[e]?</label><label kind="assignment" x="-752" y="-736">enqueue(e), approaching_id = e</label><nail x="-472" y="-552"/><nail x="-560" y="-712"/><nail x="-888" y="-712"/></transition><transition><source ref="id0"/><target ref="id1"/><label kind="select" x="-600" y="-688">e : id_t</label><label kind="synchronisation" x="-680" y="-672">approachingPrio[e]?</label><label kind="assignment" x="-776" y="-656">enqueuePrio(e), approaching_id = e</label><nail x="-472" y="-536"/><nail x="-560" y="-624"/><nail x="-880" y="-624"/></transition></template><template><name>VA</name><parameter>const id_t id, const bool prio</parameter><declaration>bool sideA := true;
+
+clock speedTimer;
+clock waitingTimer;</declaration><location id="id2" x="-112" y="-752"><name x="-122" y="-782">Passing</name><committed/></location><location id="id3" x="-302" y="-754"><name x="-320" y="-784">Done</name></location><location id="id4" x="-112" y="-600"><name x="-96" y="-624">Authorized</name><label kind="invariant" x="-96" y="-608">speedTimer &lt;= 2</label></location><location id="id5" x="-112" y="-424"><name x="-136" y="-416">Waiting</name></location><location id="id6" x="-312" y="-424"><name x="-344" y="-416">Approching</name></location><location id="id7" x="-312" y="-600"><name x="-368" y="-632">NotAttendingBridge</name></location><init ref="id7"/><transition><source ref="id2"/><target ref="id3"/><label kind="synchronisation" x="-232" y="-776">passed[id]!</label></transition><transition><source ref="id6"/><target ref="id4"/><label kind="synchronisation" x="-216" y="-512">pass[id]?</label><label kind="assignment" x="-232" y="-496">speedTimer := 0</label></transition><transition><source ref="id7"/><target ref="id6"/><label kind="guard" x="-400" y="-560">prio==true</label><label kind="synchronisation" x="-448" y="-544">approachingPrio[id]!</label><nail x="-328" y="-536"/></transition><transition><source ref="id4"/><target ref="id2"/><label kind="guard" x="-104" y="-712">speedTimer &gt;= 2</label><label kind="assignment" x="-104" y="-696">speedTimer := 0</label></transition><transition><source ref="id5"/><target ref="id4"/><label kind="synchronisation" x="-104" y="-512">pass[id]?</label><label kind="assignment" x="-104" y="-496">speedTimer := 0</label></transition><transition><source ref="id6"/><target ref="id5"/><label kind="synchronisation" x="-216" y="-424">wait[id]?</label><label kind="assignment" x="-248" y="-408">waitingTimer := 0</label></transition><transition><source ref="id7"/><target ref="id6"/><label kind="guard" x="-296" y="-560">prio==false</label><label kind="synchronisation" x="-296" y="-544">approaching[id]!</label><nail x="-296" y="-488"/></transition></template><system>va1 := VA(1, false);
+va2 := VA(2, false);
+va3 := VA(3, true);
+va4 := VA(4, false);
+va5 := VA(5, true);
+
+c := Controller();
+
+system c, va1, va2, va3, va4, va5;</system></nta>
