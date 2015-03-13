@@ -163,7 +163,129 @@ void entry() {
 	  
 	  <h3><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deuxième partie</h3>
 	  
+	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant VA</h4>
+	  
+	  <img src="images/VA.png"></img>
+	  
 	  <p>TODO</p>
+	  
+	  <p>Fonctions du modèle :</p>
+	  <pre><code class="c">bool sideA := true;
+clock speedTimer;
+clock waitingTimer;
+
+Parameters : const id_t id, const bool prio
+	  </code></pre>
+	  
+	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant Controller</h4>
+	  
+	  <img src="images/C.png"></img>
+	  
+	  <p>TODO</p>
+	  
+	  <p>Fonctions du modèle :</p>
+	  <pre><code class="c">id_t list[N+1];
+int[0,N] len;
+
+id_t listPrio[N+1];
+int[0,N] lenPrio;
+
+id_t passing_id;
+id_t approaching_id;
+
+void enqueue(id_t element)
+{
+        list[len++] = element;
+}
+
+void dequeue()
+{
+        int i = 0;
+        len -= 1;
+        while (i < len)
+        {
+                list[i] = list[i + 1];
+                i++;
+        }
+        list[i] = 0;
+}
+
+void enqueuePrio(id_t element)
+{
+        listPrio[lenPrio++] = element;
+}
+
+void dequeuePrio()
+{
+        int i = 0;
+        lenPrio -= 1;
+        while (i < lenPrio)
+        {
+                listPrio[i] = listPrio[i + 1];
+                i++;
+        }
+        listPrio[i] = 0;
+}
+
+void dequeueWithId(id_t element)
+{
+	if (listPrio[0] == element)
+		dequeuePrio();
+	else if (list[0] == element)
+		dequeue();
+}
+
+bool isFrontPrio()
+{
+	return lenPrio > 0;
+}
+
+int queueCount()
+{
+	return len + lenPrio;
+}
+
+id_t front()
+{
+	if (isFrontPrio()) 
+		return listPrio[0];
+	else
+		return list[0];
+}
+
+id_t tail()
+{
+	if (len > 0)
+		return list[len - 1];
+	else
+		return listPrio[lenPrio - 1];
+}
+	  </code></pre>
+	  
+	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant P</h4>
+	  <p>Dans la modélisation présente, le composant P n’existe pas, car le pont n’a aucune intelligence étant donné qu’il s’agit que du matériel. Étant donné 
+	  qu’il n’y a pas d’intelligence sur ce composant, le pont est entièrement pris en charge par le contrôleur du pont, soit le CTRLP.</p>
+	  
+	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Assemblage</h4>
+	  
+	  <p>???</p>
+	  
+	  <pre><code class="c">const int N = 6;
+typedef int[0,N-1] id_t;
+
+chan        approaching[N], approachingPrio[N], wait[N];
+urgent chan pass[N], passed[N];
+	  </code></pre>
+	  
+	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vérification</h4>
+	  
+	  <p>Procédez à la vérification formelle du modèle pour les propriétés suivantes :</p>
+	  <p>P1 : Il n’y a pas de collision (i.e. deux véhicules circulants en sens inverse) sur le pont.</p>
+	  <pre><code>A[] va1.Passing + va2.Passing + va3.Passing + va4.Passing + va5.Passing <= 1</code></pre>
+	  <p>P2 : Un véhicule normal qui arrive est certain de passer sur le pont à l’issue d’une durée bornée.</p>
+	  <pre><code>A[] not (va1.Waiting and va1.waitingTimer > 15 and va2.Waiting and va2.waitingTimer > 15 and va4.Waiting and va4.waitingTimer > 15)</code></pre>
+	  <p>P3 : Un véhicule prioritaire qui arrive est certain de passer sur le pont à l’issue d’une durée bornée avant tout autre véhicule normal qui n’est pas encore entré sur le pont.</p>
+	  <pre><code>A[] not (va3.Waiting and va3.waitingTimer > 5 and va5.Waiting and va5.waitingTimer > 5 and ( c.front() == 3 || c.front() == 5) )</code></pre>
 	  
       </section>
     </div>
