@@ -214,7 +214,7 @@ system PCTL, vehicleA, vehicleB, vehicleA2;</code></pre>
 	  
 	  <img src="images/VA.png"></img>
 	  
-	  <p>TODO</p>
+	  <p>Le contrôleur prend la tache de trier les véhicules qui approchent. Quand un véhicule approche, il est mis dans une des listes de queue, sois prioritaire ou non. Si un véhicule arrive et il y a des véhicules dans la liste d’attente, il est mis dans l’état d’attente [wait].  Le contrôleur, ensuite, gère sa liste de ceux qui attendent, s’il n’y a aucun véhicule en train de passer (passing_id == 0) il cherchera le prochain véhicule qui attend et le met en état [pass]. S’il y a un véhicule en train de passer, le contrôleur remettra le passing_id à 0 et sortira le prochain véhicule de sa liste, en regardant la listPrio en premier.</p>
 	  
 	  <p>Fonctions du modèle :</p>
 	  <pre><code class="c">bool sideA := true;
@@ -227,7 +227,7 @@ Parameters : const id_t id, const bool prio</code></pre>
 	  
 	  <img src="images/C.png"></img>
 	  
-	  <p>TODO</p>
+	  <p>Quand un véhicule entre dans l’état de rapprochement, c’est évalué s’il est un véhicule prioritaire. L’état de rapprochement dépend de si le véhicule est prioritaire ou non.  Ensuite, s’il y a des véhicules déjà en train de passer, ou en attente, le véhicule entre dans un état d’attente. Sinon, il peut passer directement à autorisé [authorised]. À ce moment, une horloge commence de 0 [speedTimer], cette horloge est pour donner le temps au véhicule à se rendre à passer le pont. De ce moment, ils peuvent faire la transition directement à passing et finalement passed. Passing et passed sont des canaux urgents.</p>
 	  
 	  <p>Fonctions du modèle :</p>
 	  <pre><code class="c">id_t list[N+1];
@@ -313,7 +313,7 @@ id_t tail()
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Assemblage</h4>
 
-	  <p>TODO</p>
+	  <p>Il existe 5 véhicules et 1 contrôleur. Il est donc nécessaire à donner un identifiant aux 5 véhicules, soit id_t, qui peut prendre les valeurs entre 0 et 5. Il existe aussi 6 canaux, 1 pour le contrôleur et 5 pour les véhicules,  un canal pour chaque véhicule. Les canaux séparés sont nécessaires, car tous véhicules doivent pouvoir prendre des actions indépendamment.  Comme mentionné au paravent, les canaux pass et passed sont mise comme urgente, donc il n’aura aucun arrêt pour un véhicule rendu dans ces états.</p>
 
 	  <pre><code class="c">const int N = 6;
 typedef int[0,N-1] id_t;
