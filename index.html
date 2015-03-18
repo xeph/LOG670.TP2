@@ -94,15 +94,13 @@ void startRequest() {
   requestAsked := true;
   waitingTime := 0;
   requestTime := 0;
-}
-	  </code></pre>
-	  
+}</code></pre>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant P</h4>
 	  <p>Dans la modélisation présente, le composant P n’existe pas, car le pont n’a aucune intelligence étant donné qu’il s’agit que du matériel. Étant donné 
 	  qu’il n’y a pas d’intelligence sur ce composant, le pont est entièrement pris en charge par le contrôleur du pont, soit le CTRLP.</p>
 
-	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant P</h4>
+	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant CTRLP</h4>
 	  
 	  <img src="images/CTRLP.png"></img>
 	  
@@ -141,12 +139,61 @@ void endExitB() {
 void entry() {
   carOnBridge++;
   carFlowTime := 0;
-}
-	  </code></pre>
+}</code></pre>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Assemblage</h4>
 	  
-	  <p>???</p>
+	  <p>Afin de pouvoir assembler le tout, voici les composants supplémentaires dans les déclarations globales :</p>
+<pre><code class="c">// Place global declarations here.
+const int MINPASSTIME = 10;
+const int MAXPASSTIME = 20;
+const int MAXWAITTIME = 200;
+const int MAXPASSCAR = 3;
+const int MAXREQUEST = 11;
+
+chan RequestA, AcceptedA, RejectedA, RequestB, AcceptedB, RejectedB;
+chan EntryA, ExitA, EntryB, ExitB;
+</code></pre>
+
+<p>Définition des constantes :</p>
+<ul>
+<li>MINPASSTIME : Le temps minimal que le véhicule peut traverser le pont;</li>
+<li>MAXPASSTIME : Le temps maximal que le véhicule peut prendre pour traverser le pont;</li>
+<li>MAXWAITTIME : Le délai d’attente maximal pour que le véhicule reste en attente pour traverser le pont;</li>
+<li>MAXPASSCAR : Le nombre de fois que chaque instance de véhicules peut passer sur le pont afin de simuler un flux constant de véhicule;</li>
+<li>MAXREQUEST : Le temps maximal pour qu’un véhicule attend entre chaque requête au contrôleur du pont pour y passer.</li>
+</ul>
+
+<p>Définition des canaux de communication :</p>
+<ul>
+<li>RequestA : Message du véhicule A pour sa demande d’accès au pont;</li>
+<li>AcceptedA : Message du contrôleur au véhicule A l’informant qu’il peut passer sur le pont;</li>
+<li>RejectedA : Message du contrôleur au véhicule A l’informant qu’il ne peut pas passer sur le pont;</li>
+<li>RequestB : Message du véhicule B pour sa demande d’accès au pont;</li>
+<li>AcceptedB : Message du contrôleur au véhicule B l’informant qu’il peut passer sur le pont;</li>
+<li>RejectedB : Message du contrôleur au véhicule B l’informant qu’il ne peut pas passer sur le pont;</li>
+<li>EntryA : Message du véhicule A informant le contrôleur que le véhicule s’engage sur le pont à l’entrée A;</li>
+<li>EntryB : Message du véhicule B informant le contrôleur que le véhicule s’engage sur le pont à l’entrée B;</li>
+<li>ExitA : Message du véhicule A informant le contrôleur que le véhicule a traversé la sortie A;</li>
+<li>ExitB : Message du véhicule B informant le contrôleur que le véhicule a traversé la sortie B.</li>
+</ul>
+
+L’assemblage du système se fait à l’aide de ces déclarations :
+
+<pre><code class="c">// Place template instantiations here.
+vehicleA = VAA();
+vehicleA2 = VAA();
+vehicleB = VAB();
+PCTL = BridgeControler();
+
+// List one or more processes to be composed into a system.
+system PCTL, vehicleA, vehicleB, vehicleA2;</code></pre>
+
+<p>Comme il est possible de le constater, le système possède deux véhicules de type A et un véhicule de type B. De plus, tel de mentionner plus tôt, il n’y a que le contrôleur du pont. Ceci est dû au fait que le pont n’est qu’une structure matérielle sans intelligence. Lors de la simulation, à l’aide du fait que les véhicules passent plusieurs fois, il est maintenant possible de pouvoir faire une simulation d’un flux constant de véhicule où il y a 6 véhicules du côté A et 3 véhicules du côté B sans réellement savoir quand est-ce que les véhicules vont arriver.</p>
+
+<p>Le tout mis ensemble fait le système suivant :</p>
+	  
+<img src="images/assemblage1.png"></img>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vérification</h4>
 	  
@@ -174,8 +221,7 @@ void entry() {
 clock speedTimer;
 clock waitingTimer;
 
-Parameters : const id_t id, const bool prio
-	  </code></pre>
+Parameters : const id_t id, const bool prio</code></pre>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant Controller</h4>
 	  
@@ -259,23 +305,21 @@ id_t tail()
 		return list[len - 1];
 	else
 		return listPrio[lenPrio - 1];
-}
-	  </code></pre>
+}</code></pre>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Modélisation du composant P</h4>
 	  <p>Dans la modélisation présente, le composant P n’existe pas, car le pont n’a aucune intelligence étant donné qu’il s’agit que du matériel. Étant donné 
 	  qu’il n’y a pas d’intelligence sur ce composant, le pont est entièrement pris en charge par le contrôleur du pont, soit le CTRLP.</p>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Assemblage</h4>
-	  
-	  <p>???</p>
-	  
+
+	  <p>TODO</p>
+
 	  <pre><code class="c">const int N = 6;
 typedef int[0,N-1] id_t;
 
 chan        approaching[N], approachingPrio[N], wait[N];
-urgent chan pass[N], passed[N];
-	  </code></pre>
+urgent chan pass[N], passed[N];</code></pre>
 	  
 	  <h4><a id="partie1" class="anchor" href="#partie1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Vérification</h4>
 	  
